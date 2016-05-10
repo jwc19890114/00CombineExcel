@@ -1,0 +1,58 @@
+import xlrd
+import os
+import os.path
+import xlwt
+
+'''
+对多个刷卡文件进行处理，xls格式合并为一个xls文件
+'''
+
+
+def openTest(filepath):
+    list = []
+    data = xlrd.open_workbook(filepath, encoding_override='gbk')
+    sheet = data.sheet_by_index(0)
+    for row_index in range(sheet.nrows):
+        cellcontent = sheet.cell(row_index, 0).value
+        list.append(cellcontent)
+        # print(cellcontent)
+    return list
+
+
+def writeTest(filepath, ID_list):
+    file = xlwt.Workbook()
+    table = file.add_sheet('result')
+    for i in range(len(ID_list)):
+        table.write(i, 0, ID_list[i])
+    file.save(filepath)
+
+
+def getFillPath(rootdir):
+    dir_list = []
+    for parent, dirnames, filenames in os.walk(rootdir):
+        for filename in filenames:
+            # print("parent folder is:" + parent)
+            fillpath = str(os.path.join(parent, filename))
+            print(fillpath)
+            dir_list.append(fillpath)
+
+    return dir_list
+
+
+def get_id_list(dir_list):
+    ID_list = []
+    for dir in dir_list:
+        ori_list = openTest(dir)
+        for ori in ori_list:
+            ID_list.append(ori)
+    for id in ID_list:
+        print(id)
+    return ID_list
+
+
+if __name__ == '__main__':
+    rootdir = r'C:\Users\Alex\Desktop\ID'
+    newdir = r'C:\Users\Alex\Desktop\ID\result.xls'
+    dir_list = getFillPath(rootdir)
+    ID_list = get_id_list(dir_list)
+    writeTest(newdir, ID_list)
